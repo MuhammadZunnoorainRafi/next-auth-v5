@@ -4,7 +4,7 @@ import { FaGithub } from 'react-icons/fa';
 
 function Socials() {
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-2 w-full">
       <Button className="w-full" size="lg" variant="outline">
         <FcGoogle />
       </Button>

@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader } from '../ui/card';
-import Header from './header';
+import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
+import BackButton from './BackButton';
+import Header from './Header';
 import Socials from './Socials';
 
 interface CardWrapperProp {
@@ -23,7 +24,10 @@ function CardWrapper({
         <Header label={headerLable} />
       </CardHeader>
       <CardContent>{children}</CardContent>
-      {showSocial && <Socials />}
+      <CardFooter>{showSocial && <Socials />}</CardFooter>
+      <CardFooter>
+        <BackButton href={backButtonHref} lable={backButtonLable} />
+      </CardFooter>
     </Card>
   );
 }
