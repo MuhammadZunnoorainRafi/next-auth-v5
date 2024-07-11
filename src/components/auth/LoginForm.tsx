@@ -34,11 +34,12 @@ function LoginForm() {
   });
 
   const formSubmit = async (formData: LogType) => {
+    setSuccessMessage('');
+    setErrorMessage('');
     startTransition(() => {
       login(formData).then((data) => {
         setSuccessMessage(data.success);
         setErrorMessage(data.error);
-        if (successMessage) form.reset();
       });
     });
 

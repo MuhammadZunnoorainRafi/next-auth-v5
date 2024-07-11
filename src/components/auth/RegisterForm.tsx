@@ -41,16 +41,11 @@ function RegisterForm() {
       register(formData).then((data) => {
         setSuccessMessage(data.success);
         setErrorMessage(data.error);
-        if (successMessage) return form.reset();
       });
     });
-
-    // const res = await login(formData);
-    // if (res?.error) {
-    //   setErrorMessage(res.error);
-    // } else {
-    //   setSuccessMessage(res.success);
-    // }
+    if (successMessage) {
+      form.reset();
+    }
   };
   return (
     <CardWrapper
