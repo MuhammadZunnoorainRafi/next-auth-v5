@@ -1,8 +1,10 @@
 import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
 async function SettingsPage() {
-  const test = await auth();
-  return <div>{JSON.stringify(test)}</div>;
+  const session = await auth();
+  if (!session) redirect('/auth/login');
+  return <div>{JSON.stringify(session)}</div>;
 }
 
 export default SettingsPage;

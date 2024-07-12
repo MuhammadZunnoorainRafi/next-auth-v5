@@ -38,8 +38,7 @@ function LoginForm() {
     setErrorMessage('');
     startTransition(() => {
       login(formData).then((data) => {
-        setSuccessMessage(data.success);
-        setErrorMessage(data.error);
+        setErrorMessage(data?.error);
       });
     });
 

@@ -1,18 +1,44 @@
 'use server';
 
+import { signIn } from '@/auth';
 import { LogType } from '@/components/auth/LoginForm';
 import { RegType } from '@/components/auth/RegisterForm';
 import pool from '@/lib/db';
 import { LogSchema, RegSchema } from '@/lib/schema';
 import { getUserByEmail } from '@/procedures/users';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
+import { AuthError } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 export const login = async (formData: LogType) => {
   const validations = LogSchema.safeParse(formData);
   if (!validations.success) {
     return { error: 'Invalid Fields' };
   }
-  return { success: 'Email Sent' };
+  const { email, password } = validations.data;
+  try {
+    await signIn('credentials', {
+      email,
+      password,
+      redirectTo: '/settings',
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return { error: 'Email or Password Incorrect' };
+        case 'AccessDenied':
+          return { error: error.message };
+        case 'OAuthSignInError':
+          return { error: error.message };
+        case 'CallbackRouteError':
+          return { error: 'Email or Password Incorrect' };
+        default:
+          return { error: 'Something went wrong while loggin In' };
+      }
+    }
+    throw error;
+  }
 };
 
 export const register = async (formData: RegType) => {
@@ -26,7 +52,7 @@ export const register = async (formData: RegType) => {
 
   const db = await pool.connect();
   try {
-    const userExists = await getUserByEmail(db, email);
+    const userExists = await getUserByEmail(email);
     if (userExists) {
       return { error: 'User already exists' };
     }

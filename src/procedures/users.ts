@@ -1,15 +1,27 @@
 import pool from '@/lib/db';
-import { UUID } from 'crypto';
-import { PoolClient } from 'pg';
 
-export const getUserByEmail = async (db: PoolClient, email: string) => {
+export type UserRoleT = 'ADMIN' | 'USER';
+
+export type UserT = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+};
+
+export const getUserByEmail = async (email: string): Promise<UserT> => {
+  const db = await pool.connect();
   const { rows } = await db.query(`SELECT * FROM users WHERE email = $1`, [
     email,
   ]);
+  db.release();
   return rows[0];
 };
 
-export const getUserById = async (db: PoolClient, id: UUID) => {
+export const getUserById = async (id: string): Promise<UserT> => {
+  const db = await pool.connect();
   const { rows } = await db.query(`SELECT * FROM users WHERE id = $1`, [id]);
+  db.release();
   return rows[0];
 };

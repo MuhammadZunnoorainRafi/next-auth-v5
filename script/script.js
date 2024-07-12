@@ -7,6 +7,7 @@ const createUsersTable = async (db) => {
                         name VARCHAR(255),
                         email VARCHAR(255),
                         password VARCHAR(255),
+                        role role_enum DEFAULT 'USER',
                         "emailVerified" TIMESTAMPTZ,
                         image TEXT
                 )`);
@@ -43,15 +44,13 @@ const main = async () => {
 
   await createUsersTable(db);
   await createAccountsTable(db);
-  await getUserByIdProcedure(db);
-  await getUserByEmailProcedure(db);
 
   db.release();
 };
 
 main()
   .then(() => console.log('Tables created successfully 🎉'))
-  .catch((error) => console.log('Error while creating Tables =', error));
+  .catch((error) => console.log(error));
 
 //   CREATE OR REPLACE PROCEDURE getEmailById(IN user_id INT)
 // LANGUAGE plpgsql
@@ -60,3 +59,49 @@ main()
 //     SELECT email FROM users WHERE users.id = user_id;
 // END;
 // $$;
+
+const process = require('process');
+
+// Define a class for Terminal
+class Terminal_Dimensions {
+  constructor() {
+    this.width = process.stdout.columns;
+    this.height = process.stdout.rows;
+  }
+}
+
+// Implement timing
+let timing_start;
+const time_limit = 9999; // maximum time limit in milliseconds
+
+const timing_start_m_ = () => {
+  timing_start = new Date();
+};
+
+const timing_end_m_ = () => {
+  let timing_end = new Date();
+  let time_spent = timing_end - timing_start; // in ms
+
+  return time_spent;
+};
+
+// Optimized function to test the timing mechanism
+const some_function_w_ = () => {
+  for (let i = 0; i < 999999; i++) {
+    // Some operation
+  }
+};
+
+// Run function with timing
+let my_terminal = new Terminal_Dimensions();
+console.log(
+  `Terminal dimensions: ${my_terminal.width} x ${my_terminal.height}`
+);
+
+timing_start_m_();
+some_function_w_();
+let execution_time = timing_end_m_();
+
+if (execution_time > time_limit) {
+  console.log(`Execution took too long! Time: ${execution_time} ms`);
+}
