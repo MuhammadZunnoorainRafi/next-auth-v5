@@ -2,6 +2,7 @@ import PostgresAdapter from '@auth/pg-adapter';
 import NextAuth from 'next-auth';
 import pool from './lib/db';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { LogSchema } from './lib/schema';
 import { getUserByEmail, getUserById, UserRoleT } from './procedures/users';
 import bcrypt from 'bcryptjs';
@@ -10,6 +11,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PostgresAdapter(pool),
   session: { strategy: 'jwt' },
   secret: process.env.AUTH_SECRET,
+  events: {
+    linkAccount: async ({ user }) => {
+      const db = await pool.connect();
+      await db.query(`UPDATE users SET "emailVerified" = $1 WHERE id = $2`, [
+        new Date(),
+        user.id,
+      ]);
+      db.release();
+    },
+  },
   callbacks: {
     session: async ({ session, token }) => {
       if (token.sub && session.user) {
@@ -31,6 +42,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     Credentials({
       authorize: async (credentials) => {
         const validations = LogSchema.safeParse(credentials);
