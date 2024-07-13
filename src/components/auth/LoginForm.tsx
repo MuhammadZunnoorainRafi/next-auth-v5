@@ -18,10 +18,17 @@ import { login } from '@/actions/auth-actions';
 import { useState, useTransition } from 'react';
 import { LogSchema } from '@/lib/schema';
 import FormError from '../FormError';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export type LogType = z.infer<typeof LogSchema>;
 
 function LoginForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const urlParams = new URLSearchParams(searchParams);
+  const urlError = searchParams.get('error')
+    ? 'Another account already exists with the same email address'
+    : '';
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [successMessage, setSuccessMessage] = useState<string | undefined>('');
@@ -36,18 +43,23 @@ function LoginForm() {
   const formSubmit = async (formData: LogType) => {
     setSuccessMessage('');
     setErrorMessage('');
+    if (urlParams.has('error')) {
+      urlParams.delete('error');
+      router.push('/auth/login');
+    }
+
     startTransition(() => {
       login(formData).then((data) => {
         setErrorMessage(data?.error);
+        setSuccessMessage(data?.success);
       });
+      // const res = await login(formData);
+      // if (res?.error) {
+      //   setErrorMessage(res.error);
+      // } else {
+      //   setSuccessMessage(res.success);
+      // }
     });
-
-    // const res = await login(formData);
-    // if (res?.error) {
-    //   setErrorMessage(res.error);
-    // } else {
-    //   setSuccessMessage(res.success);
-    // }
   };
 
   return (
@@ -97,7 +109,7 @@ function LoginForm() {
         </form>
       </Form>
       <FormSuccess message={successMessage} />
-      <FormError message={errorMessage} />
+      <FormError message={errorMessage || urlError} />
     </CardWrapper>
   );
 }

@@ -8,6 +8,7 @@ export type UserT = {
   email: string;
   role: string;
   password: string;
+  emailVerified: Date;
 };
 
 export const getUserByEmail = async (email: string): Promise<UserT> => {

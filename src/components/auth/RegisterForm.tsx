@@ -18,10 +18,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RegSchema } from '@/lib/schema';
 import { z } from 'zod';
 import { register } from '@/actions/auth-actions';
+import { useSearchParams } from 'next/navigation';
 
 export type RegType = z.infer<typeof RegSchema>;
 
 function RegisterForm() {
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get('error')
+    ? 'Another account already exists with the same email address'
+    : '';
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [successMessage, setSuccessMessage] = useState<string | undefined>('');
@@ -108,7 +113,7 @@ function RegisterForm() {
         </form>
       </Form>
       <FormSuccess message={successMessage} />
-      <FormError message={errorMessage} />
+      <FormError message={errorMessage || urlError} />
     </CardWrapper>
   );
 }
