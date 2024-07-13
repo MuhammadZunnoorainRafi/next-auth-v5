@@ -5,7 +5,7 @@ import { LogType } from '@/components/auth/LoginForm';
 import { RegType } from '@/components/auth/RegisterForm';
 import pool from '@/lib/db';
 import { LogSchema, RegSchema } from '@/lib/schema';
-import { getUserByEmail } from '@/procedures/users';
+import { getUserByEmail } from '@/procedures/usersProcedure';
 import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 import { redirect } from 'next/navigation';

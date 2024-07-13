@@ -5,7 +5,7 @@ const createUsersTable = async (db) => {
   await db.query(`CREATE TABLE IF NOT EXISTS users(
                         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
                         name VARCHAR(255),
-                        email VARCHAR(255),
+                        email VARCHAR(255) NOT NULL UNIQUE,
                         password VARCHAR(255),
                         role role_enum DEFAULT 'USER',
                         "emailVerified" TIMESTAMPTZ,
@@ -31,6 +31,16 @@ const createAccountsTable = async (db) => {
               )`);
 };
 
+const createVerifyTokenTable = async (db) => {
+  await db.query(`CREATE TABLE IF NOT EXISTS verification_token(
+                        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+                        email VARCHAR(255) NOT NULL,
+                        token TEXT NOT NULL UNIQUE,
+                        expires TIMESTAMPTZ NOT NULL,
+                        UNIQUE(email,token)
+              )`);
+};
+
 const main = async () => {
   const pool = new Pool({
     user: process.env.DATABASE_USER,
@@ -44,6 +54,7 @@ const main = async () => {
 
   await createUsersTable(db);
   await createAccountsTable(db);
+  await createVerifyTokenTable(db);
 
   db.release();
 };

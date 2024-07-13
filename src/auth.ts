@@ -4,13 +4,18 @@ import pool from './lib/db';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import { LogSchema } from './lib/schema';
-import { getUserByEmail, getUserById, UserRoleT } from './procedures/users';
+import {
+  getUserByEmail,
+  getUserById,
+  UserRoleT,
+} from './procedures/usersProcedure';
 import bcrypt from 'bcryptjs';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PostgresAdapter(pool),
   session: { strategy: 'jwt' },
   secret: process.env.AUTH_SECRET,
+  pages: { signIn: '/auth/login', error: '/auth/error' },
   events: {
     linkAccount: async ({ user }) => {
       const db = await pool.connect();
