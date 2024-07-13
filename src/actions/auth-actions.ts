@@ -105,7 +105,6 @@ export const register = async (formData: RegType) => {
 };
 
 // EMAIL VERIFICATION ACTION
-
 export const newEmailVerification = async (token: string) => {
   const db = await pool.connect();
 
@@ -130,8 +129,14 @@ export const newEmailVerification = async (token: string) => {
 
     await db.query(
       `UPDATE users SET "emailVerified" = $1, email= $2 WHERE id = $3`,
-      [new Date(), tokenExists.email, user.id]
+      [new Date(), tokenExists.email, user.id] // tokenExists.email is when user wants to update his email
     );
+
+    await db.query(`DELETE FROM verification_token WHERE id = $1`, [
+      tokenExists.id,
+    ]);
+
+    return { success: 'Email Verified Successfully' };
   } catch (error) {
     console.log(error);
     return { error: 'Internal Server Error' };

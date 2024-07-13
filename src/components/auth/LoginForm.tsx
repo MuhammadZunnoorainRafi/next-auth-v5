@@ -19,6 +19,7 @@ import { useState, useTransition } from 'react';
 import { LogSchema } from '@/lib/schema';
 import FormError from '../FormError';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export type LogType = z.infer<typeof LogSchema>;
 
@@ -103,6 +104,9 @@ function LoginForm() {
               </FormItem>
             )}
           />
+          <Button size="sm" variant="link" className="px-0 font-normal" asChild>
+            <Link href="/auth/reset">Forgot password?</Link>
+          </Button>
           <Button disabled={isPending} className="w-full" type="submit">
             Submit
           </Button>
