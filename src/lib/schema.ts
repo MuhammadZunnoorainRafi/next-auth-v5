@@ -7,6 +7,10 @@ export const ResetSchema = z.object({
     .email({ message: 'Enter a valid email address' }),
 });
 
+export const NewPasswordSchema = z.object({
+  password: z.string().min(5, 'Password must be above 5 characters'),
+});
+
 export const LogSchema = z.object({
   email: z
     .string()

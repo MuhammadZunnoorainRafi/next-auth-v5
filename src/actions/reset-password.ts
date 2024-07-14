@@ -8,17 +8,16 @@ import { generateResetPasswordToken } from '@/lib/token-utils';
 import { getUserByEmail } from '@/procedures/usersProcedure';
 
 export const resetPassword = async (formData: ResetType) => {
-  const validations = ResetSchema.safeParse(formData);
-
-  if (!validations.success) {
-    return { error: 'Invalid fields' };
-  }
-
-  const { email } = validations.data;
-
   const db = await pool.connect();
-
   try {
+    const validations = ResetSchema.safeParse(formData);
+
+    if (!validations.success) {
+      return { error: 'Invalid fields' };
+    }
+
+    const { email } = validations.data;
+
     const userExists = await getUserByEmail(email);
 
     if (!userExists) {

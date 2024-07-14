@@ -14,6 +14,8 @@ function NewVerificationForm() {
   const token = searchParams.get('token');
 
   const onSubmit = useCallback(() => {
+    setError('');
+    setSuccess('');
     if (!token) {
       setError('Token not found');
       return;

@@ -8,16 +8,16 @@ import { getUserByEmail } from '@/procedures/usersProcedure';
 import bcrypt from 'bcryptjs';
 
 export const register = async (formData: RegType) => {
-  const validations = RegSchema.safeParse(formData);
-
-  if (!validations.success) {
-    return { error: 'Invalid Fields' };
-  }
-
-  const { name, email, password } = validations.data;
-
   const db = await pool.connect();
   try {
+    const validations = RegSchema.safeParse(formData);
+
+    if (!validations.success) {
+      return { error: 'Invalid Fields' };
+    }
+
+    const { name, email, password } = validations.data;
+
     const userExists = await getUserByEmail(email);
     if (userExists) {
       return { error: 'User already exists' };

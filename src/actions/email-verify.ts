@@ -5,8 +5,11 @@ import { getUserByEmail } from '@/procedures/usersProcedure';
 
 export const newEmailVerification = async (token: string) => {
   const db = await pool.connect();
-
   try {
+    if (!token) {
+      return { error: 'Token is missing' };
+    }
+
     const tokenExists = await getVerificationTokenByToken(db, token);
 
     if (!tokenExists) {
