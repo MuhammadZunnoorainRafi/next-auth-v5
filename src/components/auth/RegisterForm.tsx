@@ -17,8 +17,8 @@ import FormError from '../FormError';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RegSchema } from '@/lib/schema';
 import { z } from 'zod';
-import { register } from '@/actions/auth-actions';
 import { useSearchParams } from 'next/navigation';
+import * as action from '@/actions/index';
 
 export type RegType = z.infer<typeof RegSchema>;
 
@@ -43,7 +43,7 @@ function RegisterForm() {
     setSuccessMessage('');
     setErrorMessage('');
     startTransition(() => {
-      register(formData).then((data) => {
+      action.register(formData).then((data) => {
         setSuccessMessage(data.success);
         setErrorMessage(data.error);
       });

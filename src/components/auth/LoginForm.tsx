@@ -14,12 +14,12 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { login } from '@/actions/auth-actions';
 import { useState, useTransition } from 'react';
 import { LogSchema } from '@/lib/schema';
 import FormError from '../FormError';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import * as action from '@/actions/index';
 
 export type LogType = z.infer<typeof LogSchema>;
 
@@ -50,7 +50,7 @@ function LoginForm() {
     }
 
     startTransition(() => {
-      login(formData).then((data) => {
+      action.login(formData).then((data) => {
         setErrorMessage(data?.error);
         setSuccessMessage(data?.success);
       });

@@ -3,9 +3,9 @@ import CardWrapper from './CardWrapper';
 import { BeatLoader } from 'react-spinners';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { newEmailVerification } from '@/actions/auth-actions';
 import FormSuccess from '../FormSuccess';
 import FormError from '../FormError';
+import * as actions from '@/actions/index';
 
 function NewVerificationForm() {
   const [error, setError] = useState<string | undefined>('');
@@ -19,7 +19,8 @@ function NewVerificationForm() {
       return;
     }
 
-    newEmailVerification(token)
+    actions
+      .newEmailVerification(token)
       .then((data) => {
         setError(data?.error);
         setSuccess(data.success);

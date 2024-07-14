@@ -34,11 +34,19 @@ const createAccountsTable = async (db) => {
 const createVerifyTokenTable = async (db) => {
   await db.query(`CREATE TABLE IF NOT EXISTS verification_token(
                         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-                        email VARCHAR(255) NOT NULL,
+                        email VARCHAR(255) NOT NULL UNIQUE,
                         token TEXT NOT NULL UNIQUE,
-                        expires TIMESTAMPTZ NOT NULL,
-                        UNIQUE(email,token)
+                        expires TIMESTAMPTZ NOT NULL
               )`);
+};
+
+const createPasswordResetTokenTable = async (db) => {
+  await db.query(`CREATE TABLE IF NOT EXISTS password_reset_token(
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    token TEXT NOT NULL UNIQUE,
+    expires TIMESTAMPTZ NOT NULL
+    )`);
 };
 
 const main = async () => {
@@ -55,6 +63,7 @@ const main = async () => {
   await createUsersTable(db);
   await createAccountsTable(db);
   await createVerifyTokenTable(db);
+  await createPasswordResetTokenTable(db);
 
   db.release();
 };
@@ -70,3 +79,14 @@ main()
 //     SELECT email FROM users WHERE users.id = user_id;
 // END;
 // $$;
+
+// => 👇 this table allows to have multiple tokens for same email but with unique token
+// const createVerifyTokenTable = async (db) => {
+//   await db.query(`CREATE TABLE IF NOT EXISTS verification_token(
+//                         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+//                         email VARCHAR(255) NOT NULL,
+//                         token TEXT NOT NULL UNIQUE,
+//                         expires TIMESTAMPTZ NOT NULL,
+//                         UNIQUE(email,token)
+//               )`);
+// };
