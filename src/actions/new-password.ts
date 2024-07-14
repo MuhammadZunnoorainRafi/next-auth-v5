@@ -20,8 +20,6 @@ export const newPassword = async (formData: NewPasswordType, token: string) => {
       return { error: 'Invalid fields' };
     }
 
-    const { password } = validation.data;
-
     const existingToken = await getResetPasswordTokenByToken(db, token);
 
     if (!existingToken) {
@@ -39,6 +37,8 @@ export const newPassword = async (formData: NewPasswordType, token: string) => {
     if (!existingUser) {
       return { error: 'User not found' };
     }
+
+    const { password } = validation.data;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

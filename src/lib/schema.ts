@@ -8,7 +8,7 @@ export const ResetSchema = z.object({
 });
 
 export const NewPasswordSchema = z.object({
-  password: z.string().min(5, 'Password must be above 5 characters'),
+  password: z.string().min(6, 'Password must be above 5 characters'),
 });
 
 export const LogSchema = z.object({

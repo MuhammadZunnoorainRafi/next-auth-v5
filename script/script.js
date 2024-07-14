@@ -9,6 +9,7 @@ const createUsersTable = async (db) => {
                         password VARCHAR(255),
                         role role_enum DEFAULT 'USER',
                         "emailVerified" TIMESTAMPTZ,
+                        "twoFactorConfirmation" BOOLEAN DEFAULT false,
                         image TEXT
                 )`);
 };
@@ -49,6 +50,23 @@ const createPasswordResetTokenTable = async (db) => {
     )`);
 };
 
+const createTwoFactorTokenTable = async (db) => {
+  await db.query(`CREATE TABLE IF NOT EXISTS two_factor_token(
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    token TEXT NOT NULL UNIQUE,
+    expires TIMESTAMPTZ NOT NULL
+    )`);
+};
+
+const createTwoFactorConfirmationTable = async (db) => {
+  await db.query(`CREATE TABLE IF NOT EXISTS two_factor_confirmation(
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID NOT NULL UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+};
+
 const main = async () => {
   const pool = new Pool({
     user: process.env.DATABASE_USER,
@@ -64,6 +82,8 @@ const main = async () => {
   await createAccountsTable(db);
   await createVerifyTokenTable(db);
   await createPasswordResetTokenTable(db);
+  await createTwoFactorTokenTable(db);
+  await createTwoFactorConfirmationTable(db);
 
   db.release();
 };

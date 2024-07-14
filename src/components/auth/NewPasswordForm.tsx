@@ -53,7 +53,7 @@ function NewPasswordForm() {
 
   return (
     <CardWrapper
-      headerLable="Reset your password"
+      headerLable="Enter a new Password"
       backButtonLable="Back to login"
       backButtonHref="/auth/login"
     >
