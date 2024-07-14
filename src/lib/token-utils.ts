@@ -34,11 +34,11 @@ export const generateVerificationToken = async (
 export const generateResetPasswordToken = async (
   db: PoolClient,
   email: string
-) => {
+): Promise<VerificationToken> => {
   const values = {
     token: uuidv4(),
     email: email,
-    expires: new Date(new Date() + 3600 * 1000),
+    expires: new Date(new Date().getTime() + 3600 * 1000),
   };
 
   const existingToken = await getResetPasswordTokenByEmail(db, email);

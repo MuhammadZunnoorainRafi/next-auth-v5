@@ -26,7 +26,7 @@ export const register = async (formData: RegType) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const { rows: userCreated } = await db.query(
-      `INSERT INTO users (name,email,password) VALUES ($1,$2,$3) RETURNING id`,
+      `INSERT INTO users (name,email,password) VALUES ($1,$2,$3) RETURNING email`,
       [name, email, hashedPassword]
     );
 
@@ -34,7 +34,10 @@ export const register = async (formData: RegType) => {
       return { error: 'User not created' };
     }
 
-    const verificationToken = await generateVerificationToken(db, email);
+    const verificationToken = await generateVerificationToken(
+      db,
+      userCreated[0].email
+    );
     await sendVerificationEmail(
       verificationToken.token,
       verificationToken.email

@@ -1,4 +1,5 @@
 'use server';
+import { signIn } from '@/auth';
 import { LogType } from '@/components/auth/LoginForm';
 import pool from '@/lib/db';
 import { sendVerificationEmail } from '@/lib/mail';
@@ -6,7 +7,6 @@ import { LogSchema } from '@/lib/schema';
 import { generateVerificationToken } from '@/lib/token-utils';
 import { getUserByEmail } from '@/procedures/usersProcedure';
 import { AuthError } from 'next-auth';
-import { signIn } from 'next-auth/react';
 
 export const login = async (formData: LogType) => {
   const validations = LogSchema.safeParse(formData);

@@ -12,3 +12,14 @@ export const sendVerificationEmail = async (token: string, email: string) => {
     html: `<p>Click <a href="${confirmLink}">here</a> to confirm email.</p>`,
   });
 };
+
+export const sendPasswordResetEmail = async (token: string, email: string) => {
+  const confirmLink = `http://localhost:3000/auth/new-password?token=${token}`;
+
+  await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: email,
+    subject: 'Password reset email',
+    html: `<p>Click <a href="${confirmLink}">here</a> to confirm email.</p>`,
+  });
+};
