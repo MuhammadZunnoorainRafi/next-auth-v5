@@ -54,7 +54,13 @@ export const login = async (formData: LogType) => {
         }
 
         if (twoFactorToken.token !== code) {
-          return { error: 'Code not matched' };
+          return { error: 'Invalid code' };
+        }
+
+        const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+        if (hasExpired) {
+          return { error: 'Code expired!' };
         }
 
         await db.query(`DELETE FROM two_factor_token WHERE id = $1`, [
@@ -80,6 +86,9 @@ export const login = async (formData: LogType) => {
           db,
           existingUser.email
         );
+        if (!twoFactorToken) {
+          return { error: 'Token not generated' };
+        }
         await sendTwoFactorCodeEmail(
           twoFactorToken.email,
           twoFactorToken.token
@@ -93,6 +102,8 @@ export const login = async (formData: LogType) => {
       password,
       redirectTo: '/settings',
     });
+
+    return { success: 'User signed In' };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

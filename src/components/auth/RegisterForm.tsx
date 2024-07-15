@@ -28,8 +28,8 @@ function RegisterForm() {
     ? 'Another account already exists with the same email address'
     : '';
   const [isPending, startTransition] = useTransition();
-  const [errorMessage, setErrorMessage] = useState<string | undefined>('');
-  const [successMessage, setSuccessMessage] = useState<string | undefined>('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const form = useForm<RegType>({
     resolver: zodResolver(RegSchema),
     defaultValues: {
@@ -44,8 +44,8 @@ function RegisterForm() {
     setErrorMessage('');
     startTransition(() => {
       action.register(formData).then((data) => {
-        setSuccessMessage(data.success);
-        setErrorMessage(data.error);
+        if (data.success) setSuccessMessage(data.success);
+        if (data.error) setErrorMessage(data.error);
       });
     });
     if (successMessage) {
@@ -62,31 +62,31 @@ function RegisterForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-2">
           <FormField
-            disabled={isPending}
             control={form.control}
             name="name"
+            disabled={isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="johndoe" {...field} />
+                  <Input {...field} type="text" placeholder="johndoe" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <FormField
-            disabled={isPending}
             control={form.control}
             name="email"
+            disabled={isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
+                    {...field}
                     type="email"
                     placeholder="johndoe@gmail.com"
-                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -101,7 +101,7 @@ function RegisterForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="******" {...field} />
+                  <Input {...field} type="password" placeholder="******" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

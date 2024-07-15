@@ -38,7 +38,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return false;
         }
 
-        if (userExists.isTwoFactorEnabled && userExists.email) {
+        if (userExists.isTwoFactorEnabled) {
           const existingTwoFactorConfirmationUser =
             await getTwoFactorConfirmationByUserId(userExists.id);
           if (!existingTwoFactorConfirmationUser) return false;
@@ -87,7 +87,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           if (!user || !user.password) {
             return null;
           }
-
           const matchedPassword = await bcrypt.compare(password, user.password);
           if (matchedPassword) return user;
         }

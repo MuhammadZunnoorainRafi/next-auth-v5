@@ -31,7 +31,7 @@ function LoginForm() {
     ? 'Another account already exists with the same email address'
     : '';
   const [isPending, startTransition] = useTransition();
-  const [twoFactor, setTwoFactor] = useState(false);
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [successMessage, setSuccessMessage] = useState<string | undefined>('');
   const form = useForm<LogType>({
@@ -51,30 +51,31 @@ function LoginForm() {
     }
 
     startTransition(() => {
-      action.login(formData).then((data) => {
-        if (data?.error) {
-          form.reset();
-          setErrorMessage(data.error);
-        }
+      action
+        .login(formData)
+        .then((data) => {
+          if (data?.error) {
+            setErrorMessage(data.error);
+          }
 
-        if (data?.success) {
-          form.reset();
-          setSuccessMessage(data.success);
-        }
+          if (data?.success) {
+            form.reset();
+            setSuccessMessage(data.success);
+          }
 
-        if (data?.twoFactor) {
-          setTwoFactor(true);
-        }
-      });
-      // const res = await login(formData);
-      // if (res?.error) {
-      //   setErrorMessage(res.error);
-      // } else {
-      //   setSuccessMessage(res.success);
-      // }
+          if (data?.twoFactor) {
+            setShowTwoFactor(true);
+          }
+        })
+        .catch(() => setErrorMessage('Something went wrong'));
     });
   };
-
+  console.log({
+    email: form.getValues('email'),
+    password: form.getValues('password'),
+    showTwoFactor,
+    error: form.formState.errors,
+  });
   return (
     <CardWrapper
       headerLable="Welcome Back"
@@ -84,7 +85,7 @@ function LoginForm() {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-2">
-          {twoFactor ? (
+          {showTwoFactor && (
             <FormField
               disabled={isPending}
               control={form.control}
@@ -99,7 +100,8 @@ function LoginForm() {
                 </FormItem>
               )}
             />
-          ) : (
+          )}
+          {!showTwoFactor && (
             <>
               <FormField
                 disabled={isPending}
@@ -140,7 +142,7 @@ function LoginForm() {
             <Link href="/auth/reset">Forgot password?</Link>
           </Button>
           <Button disabled={isPending} className="w-full" type="submit">
-            Submit
+            {showTwoFactor ? 'Confirm' : 'Submit'}
           </Button>
         </form>
       </Form>
