@@ -17,6 +17,7 @@ export const LogSchema = z.object({
     .min(1, 'Enter email')
     .email({ message: 'Enter a valid email address' }),
   password: z.string().min(6, 'Password must be above 5 characters'),
+  code: z.string().min(6, 'Code must be of 6 digits').optional(),
 });
 
 export const RegSchema = z.object({

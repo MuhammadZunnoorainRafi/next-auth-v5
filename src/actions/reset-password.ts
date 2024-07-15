@@ -4,7 +4,7 @@ import { ResetType } from '@/components/auth/ResetForm';
 import pool from '@/lib/db';
 import { sendPasswordResetEmail } from '@/lib/mail';
 import { ResetSchema } from '@/lib/schema';
-import { generateResetPasswordToken } from '@/lib/token-utils';
+import { generateResetPasswordToken } from '@/lib/generate-tokens';
 import { getUserByEmail } from '@/procedures/usersProcedure';
 
 export const resetPassword = async (formData: ResetType) => {

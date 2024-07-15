@@ -1,3 +1,4 @@
+import pool from '@/lib/db';
 import { VerificationToken } from '@/lib/types';
 import { PoolClient } from 'pg';
 
@@ -25,13 +26,12 @@ export const getTwoFactorTokenByEmail = async (
 };
 
 // @desc TWO FACTOR CONFIRMATION
-export const getTwoFactorConfirmationByUserId = async (
-  db: PoolClient,
-  userId: string
-) => {
+export const getTwoFactorConfirmationByUserId = async (userId: string) => {
+  const db = await pool.connect();
   const { rows } = await db.query(
     `SELECT * FROM two_factor_confirmation WHERE user_id = $1`,
     [userId]
   );
+  db.release();
   return rows[0];
 };

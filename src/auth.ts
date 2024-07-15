@@ -10,6 +10,7 @@ import {
   UserRoleT,
 } from './procedures/usersProcedure';
 import bcrypt from 'bcryptjs';
+import { getTwoFactorConfirmationByUserId } from './procedures/2FAProceduret';
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PostgresAdapter(pool),
@@ -33,16 +34,24 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       if (user.id) {
         const userExists = await getUserById(user.id);
-
         if (!userExists.emailVerified) {
           return false;
+        }
+
+        if (userExists.isTwoFactorEnabled && userExists.email) {
+          const existingTwoFactorConfirmationUser =
+            await getTwoFactorConfirmationByUserId(userExists.id);
+          if (!existingTwoFactorConfirmationUser) return false;
+          const db = await pool.connect();
+          await db.query(
+            `DELETE FROM two_factor_confirmation WHERE user_id = $1`,
+            [userExists.id]
+          );
+          db.release();
         }
       } else {
         return false;
       }
-
-      // TODO: Add 2FA check
-
       return true;
     },
     session: async ({ session, token }) => {

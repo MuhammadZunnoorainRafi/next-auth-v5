@@ -9,7 +9,7 @@ const createUsersTable = async (db) => {
                         password VARCHAR(255),
                         role role_enum DEFAULT 'USER',
                         "emailVerified" TIMESTAMPTZ,
-                        "twoFactorConfirmation" BOOLEAN DEFAULT false,
+                        "isTwoFactorEnabled" BOOLEAN DEFAULT false,
                         image TEXT
                 )`);
 };

@@ -31,6 +31,7 @@ function LoginForm() {
     ? 'Another account already exists with the same email address'
     : '';
   const [isPending, startTransition] = useTransition();
+  const [twoFactor, setTwoFactor] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>('');
   const [successMessage, setSuccessMessage] = useState<string | undefined>('');
   const form = useForm<LogType>({
@@ -51,8 +52,19 @@ function LoginForm() {
 
     startTransition(() => {
       action.login(formData).then((data) => {
-        setErrorMessage(data?.error);
-        setSuccessMessage(data?.success);
+        if (data?.error) {
+          form.reset();
+          setErrorMessage(data.error);
+        }
+
+        if (data?.success) {
+          form.reset();
+          setSuccessMessage(data.success);
+        }
+
+        if (data?.twoFactor) {
+          setTwoFactor(true);
+        }
       });
       // const res = await login(formData);
       // if (res?.error) {
@@ -72,38 +84,58 @@ function LoginForm() {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-2">
-          <FormField
-            disabled={isPending}
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="johndoe@gmail.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={isPending}
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="******" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {twoFactor ? (
+            <FormField
+              disabled={isPending}
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Code</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="123456" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <>
+              <FormField
+                disabled={isPending}
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="johndoe@gmail.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isPending}
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="******" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+
           <Button size="sm" variant="link" className="px-0 font-normal" asChild>
             <Link href="/auth/reset">Forgot password?</Link>
           </Button>

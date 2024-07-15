@@ -2,11 +2,18 @@
 import { signIn } from '@/auth';
 import { LogType } from '@/components/auth/LoginForm';
 import pool from '@/lib/db';
-import { sendVerificationEmail } from '@/lib/mail';
+import { sendTwoFactorCodeEmail, sendVerificationEmail } from '@/lib/mail';
 import { LogSchema } from '@/lib/schema';
-import { generateVerificationToken } from '@/lib/token-utils';
+import {
+  generateTwoFactorToken,
+  generateVerificationToken,
+} from '@/lib/generate-tokens';
 import { getUserByEmail } from '@/procedures/usersProcedure';
 import { AuthError } from 'next-auth';
+import {
+  getTwoFactorConfirmationByUserId,
+  getTwoFactorTokenByEmail,
+} from '@/procedures/2FAProceduret';
 
 export const login = async (formData: LogType) => {
   const db = await pool.connect();
@@ -15,7 +22,7 @@ export const login = async (formData: LogType) => {
     if (!validations.success) {
       return { error: 'Invalid Fields' };
     }
-    const { email, password } = validations.data;
+    const { email, password, code } = validations.data;
 
     const existingUser = await getUserByEmail(email);
 
@@ -24,13 +31,61 @@ export const login = async (formData: LogType) => {
     }
 
     if (!existingUser.emailVerified) {
-      const verificationToken = await generateVerificationToken(db, email);
+      const verificationToken = await generateVerificationToken(
+        db,
+        existingUser.email
+      );
       await sendVerificationEmail(
         verificationToken.token,
         verificationToken.email
       );
 
       return { success: 'Confirmation email sent' };
+    }
+
+    if (existingUser.isTwoFactorEnabled && existingUser.email) {
+      if (code) {
+        const twoFactorToken = await getTwoFactorTokenByEmail(
+          db,
+          existingUser.email
+        );
+        if (!twoFactorToken) {
+          return { error: 'Token not found' };
+        }
+
+        if (twoFactorToken.token !== code) {
+          return { error: 'Code not matched' };
+        }
+
+        await db.query(`DELETE FROM two_factor_token WHERE id = $1`, [
+          twoFactorToken.id,
+        ]);
+
+        const existingTwoFactorConfirmationUser =
+          await getTwoFactorConfirmationByUserId(existingUser.id);
+
+        if (existingTwoFactorConfirmationUser) {
+          await db.query(
+            `DELETE FROM two_factor_confirmation WHERE user_id = $1`,
+            [existingUser.id]
+          );
+        }
+
+        await db.query(
+          `INSERT INTO two_factor_confirmation(user_id) VALUES ($1)`,
+          [existingUser.id]
+        );
+      } else {
+        const twoFactorToken = await generateTwoFactorToken(
+          db,
+          existingUser.email
+        );
+        await sendTwoFactorCodeEmail(
+          twoFactorToken.email,
+          twoFactorToken.token
+        );
+        return { twoFactor: true };
+      }
     }
 
     await signIn('credentials', {

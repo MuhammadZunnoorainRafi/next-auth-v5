@@ -3,7 +3,7 @@ import { RegType } from '@/components/auth/RegisterForm';
 import pool from '@/lib/db';
 import { sendVerificationEmail } from '@/lib/mail';
 import { RegSchema } from '@/lib/schema';
-import { generateVerificationToken } from '@/lib/token-utils';
+import { generateVerificationToken } from '@/lib/generate-tokens';
 import { getUserByEmail } from '@/procedures/usersProcedure';
 import bcrypt from 'bcryptjs';
 

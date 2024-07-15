@@ -8,6 +8,7 @@ export type UserT = {
   email: string;
   role: string;
   password: string;
+  isTwoFactorEnabled: boolean;
   emailVerified: Date;
 };
 
