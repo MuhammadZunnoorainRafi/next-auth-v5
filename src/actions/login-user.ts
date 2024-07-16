@@ -14,6 +14,7 @@ import {
   getTwoFactorConfirmationByUserId,
   getTwoFactorTokenByEmail,
 } from '@/procedures/2FAProceduret';
+import bcrypt from 'bcryptjs';
 
 export const login = async (formData: LogType) => {
   const db = await pool.connect();
@@ -28,6 +29,15 @@ export const login = async (formData: LogType) => {
 
     if (!existingUser || !existingUser.email || !existingUser.password) {
       return { error: 'Email not exists' };
+    }
+
+    const matchedPassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (!matchedPassword) {
+      return { error: 'Email or Password incorrect' };
     }
 
     if (!existingUser.emailVerified) {
