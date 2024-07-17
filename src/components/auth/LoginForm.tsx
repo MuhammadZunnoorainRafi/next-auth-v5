@@ -40,7 +40,6 @@ function LoginForm() {
       email: '',
       password: '',
     },
-    // mode: 'onSubmit',
   });
   const formSubmit = async (formData: LogType) => {
     setSuccessMessage('');

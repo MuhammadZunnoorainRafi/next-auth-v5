@@ -66,7 +66,7 @@ export const generateTwoFactorToken = async (
   const values = {
     token: crypto.randomInt(100_000, 1_000_000).toString(),
     email: email,
-    expires: new Date(new Date().getTime() + 3600 * 1000),
+    expires: new Date(new Date().getTime() + 5 * 60 * 1000),
   };
 
   const existingToken = await getTwoFactorTokenByEmail(db, email);
